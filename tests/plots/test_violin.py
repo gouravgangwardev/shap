@@ -61,7 +61,6 @@ def test_violin(explainer):
     return fig
 
 
-
 @pytest.mark.mpl_image_compare(
     filename="test_summary_violin_with_data.png",
     tolerance=5,
@@ -101,9 +100,6 @@ def test_summary_layered_violin_with_data2():
     return fig
 
 
-
-
-
 class TestViolinAxParameter:
     """Verify that the optional ``ax`` parameter behaves correctly."""
 
@@ -117,9 +113,7 @@ class TestViolinAxParameter:
         shap_values = self._make_shap_values()
         fig, _ = plt.subplots()
         result = shap.plots.violin(shap_values, show=False)
-        assert isinstance(result, plt.Axes), (
-            "violin(show=False) should return a matplotlib Axes object"
-        )
+        assert isinstance(result, plt.Axes), "violin(show=False) should return a matplotlib Axes object"
         plt.close(fig)
 
     def test_ax_parameter_draws_into_supplied_axes(self):
@@ -131,12 +125,10 @@ class TestViolinAxParameter:
 
         returned = shap.plots.violin(shap_values, ax=target_ax, show=False)
 
-
         assert returned is target_ax, "violin() must return the ax that was supplied"
 
         assert len(target_ax.get_yticks()) > 0, "Target axes should have y-tick labels after plotting"
 
-     
         assert len(other_ax.lines) == 0, "Sibling axes must not be modified"
         assert len(other_ax.collections) == 0, "Sibling axes must not be modified"
 
@@ -158,9 +150,7 @@ class TestViolinAxParameter:
 
         shap.plots.violin(shap_values, ax=ax, show=False)
 
-        assert fig.get_size_inches().tolist() == original_size, (
-            "violin() must not resize a figure when ax is provided"
-        )
+        assert fig.get_size_inches().tolist() == original_size, "violin() must not resize a figure when ax is provided"
         plt.close(fig)
 
     def test_no_ax_resizes_figure_by_default(self):
@@ -217,7 +207,7 @@ class TestViolinAxParameter:
         shap_values = rs.randn(30, 4)
         features = rs.randn(30, 4)
         fig, ax = plt.subplots()
-       
+
         returned = shap.plots.violin(
             shap_values,
             features=features,
@@ -240,8 +230,6 @@ class TestViolinAxParameter:
         shap_values = self._make_shap_values()
         fig = plt.figure()
         result = shap.plots.violin(shap_values, show=False)
-        assert result is not None, (
-            "violin(show=False) must return an Axes (was returning None before this PR)"
-        )
+        assert result is not None, "violin(show=False) must return an Axes (was returning None before this PR)"
         assert isinstance(result, plt.Axes)
         plt.close(fig)

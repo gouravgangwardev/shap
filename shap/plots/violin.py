@@ -13,12 +13,10 @@ from ..utils._exceptions import DimensionError
 from . import colors
 from ._labels import labels
 
-
 if version.parse(matplotlib.__version__) >= version.parse("3.10"):
     ORIENTATION_KWARG = dict(orientation="horizontal")
 else:
     ORIENTATION_KWARG = dict(vert=False)  # type: ignore[dict-item]
-
 
 
 # TODO: Add support for hclustering based explanations where we sort the leaf order by magnitude and then show the dendrogram to the left
@@ -119,7 +117,6 @@ def violin(
         if feature_names is None:
             feature_names = shap_exp.feature_names
 
-
     if isinstance(shap_values, list):
         emsg = "Violin plots don't support multi-output explanations! Use 'shap.plots.bar` instead."
         raise TypeError(emsg)
@@ -138,7 +135,6 @@ def violin(
             color = "coolwarm"
         else:
             color = colors.blue_rgb
-
 
     if isinstance(features, pd.DataFrame):
         if feature_names is None:
@@ -244,7 +240,6 @@ def violin(
                     else:
                         back_fill += 1
 
-       
                 nan_mask = np.isnan(values)
 
                 # Trim the value and color range to percentiles
@@ -312,7 +307,6 @@ def violin(
         shap_min, shap_max = np.min(shap_values), np.max(shap_values)
         x_points = np.linspace(shap_min, shap_max, num_x_points)
 
-    
         for pos, ind in enumerate(feature_order):
             # decide how to handle: if #unique < layered_violin_max_num_bins then split by unique value, otherwise use bins/percentiles.
             # to keep simpler code, in the case of uniques, we just adjust the bins to align with the unique counts.
@@ -325,11 +319,10 @@ def violin(
             else:
                 thesebins = bins
             nbins = thesebins.shape[0] - 1
-          
+
             order = np.argsort(feature)
             # x axis is located at y0 = pos, with pos being there for offset
 
-            
             ys = np.zeros((nbins, num_x_points))
             for i in range(nbins):
                 # get shap values in this bin:
@@ -362,13 +355,10 @@ def violin(
             scale = ys.max() * 2 / width  # 2 is here as we plot both sides of x axis
             for i in range(nbins - 1, -1, -1):
                 y = ys[i, :] / scale
-                c = (
-                    plt.get_cmap(color)(i / (nbins - 1)) if color in plt.colormaps else color
-                )  
+                c = plt.get_cmap(color)(i / (nbins - 1)) if color in plt.colormaps else color
                 plt.fill_between(x_points, pos - y, pos + y, facecolor=c, edgecolor="face")
         plt.xlim(shap_min, shap_max)
 
-  
     if (
         color_bar
         and features is not None
@@ -385,7 +375,6 @@ def violin(
         cb.ax.tick_params(labelsize=color_bar_tick_size, length=0)
         cb.set_alpha(1)
         cb.outline.set_visible(False)  # type: ignore
-
 
     # Use `ax` directly rather than plt.gca().  plt.colorbar() (above) creates
     # a new inset axes and leaves it as the pyplot "current" axes, so plt.gca()
@@ -441,5 +430,3 @@ def shorten_text(text, length_limit):
         return text[: length_limit - 3] + "..."
     else:
         return text
-
-
