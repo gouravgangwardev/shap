@@ -10,8 +10,8 @@ from ._utils import convert_ordering
 
 def heatmap(
     shap_values: Explanation,
-    instance_order=Explanation.hclust(),  # type: ignore
-    feature_values=Explanation.abs.mean(0),  # type: ignore
+    instance_order=Explanation.hclust(),  
+    feature_values=Explanation.abs.mean(0),  
     feature_order=None,
     max_display=10,
     cmap=colors.red_white_blue,
@@ -91,8 +91,7 @@ def heatmap(
     values = shap_values.values[instance_order][:, feature_order]
     feature_values = feature_values[feature_order]
 
-    # if we have more features than `max_display`, then group all the excess features
-    # into a single feature
+
     if values.shape[1] > max_display:
         new_values = np.zeros((values.shape[0], max_display))
         new_values[:, :-1] = values[:, : max_display - 1]
@@ -107,24 +106,18 @@ def heatmap(
         values = new_values
         feature_values = new_feature_values
 
-    # ------------------------------------------------------------------ #
-    # Axis resolution — mandatory pattern for API consistency              #
-    # ------------------------------------------------------------------ #
+
     _ax_provided = ax is not None
     if not _ax_provided:
         ax = plt.gca()
     plt.sca(ax)
 
-    # Resize the figure only when we own the axes (i.e. no axes was supplied
-    # by the caller).  When the caller provides an axes object we must not
-    # touch the figure dimensions so that subplot layouts are not broken.
+
     row_height = 0.5
     if not _ax_provided:
         ax.get_figure().set_size_inches(plot_width, values.shape[1] * row_height + 2.5)
 
-    # ------------------------------------------------------------------ #
-    # Draw the heatmap                                                     #
-    # ------------------------------------------------------------------ #
+
     vmin, vmax = np.nanpercentile(values.flatten(), [1, 99])
     ax.imshow(
         values.T,
@@ -151,7 +144,7 @@ def heatmap(
         [r"$f(x)$", *heatmap_yticks_labels],
         fontsize=13,
     )
-    # remove the y-tick line for the f(x) label
+
     ax.yaxis.get_ticklines()[0].set_visible(False)
 
     ax.set_xlim(-0.5, values.shape[0] - 0.5)
@@ -178,10 +171,6 @@ def heatmap(
     for b in bar_container:
         b.set_clip_on(False)
 
-    # ------------------------------------------------------------------ #
-    # Colorbar — always attach to the explicit axes so it never lands on  #
-    # a sibling axes when called from a subplot layout.                   #
-    # ------------------------------------------------------------------ #
     import matplotlib.cm as cm
 
     m = cm.ScalarMappable(cmap=cmap)
@@ -197,11 +186,8 @@ def heatmap(
     cb.set_label(labels["VALUE"], size=12, labelpad=-10)
     cb.ax.tick_params(labelsize=11, length=0)
     cb.set_alpha(1)
-    cb.outline.set_visible(False)  # type: ignore
+    cb.outline.set_visible(False)  
 
-    # ------------------------------------------------------------------ #
-    # Return contract                                                      #
-    # ------------------------------------------------------------------ #
     if show:
         plt.show()
     return ax
