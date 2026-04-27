@@ -55,14 +55,16 @@ def heatmap(
         to be customized further after it has been created.
 
     plot_width : int, default 8
-        The width of the heatmap plot.
+        The width of the heatmap plot. Only used when ``ax`` is not provided.
 
-    ax : matplotlib Axes
-        Axes object to draw the plot onto, otherwise uses the current Axes.
+    ax : matplotlib.axes.Axes, optional
+        Axes object to draw the plot onto. If ``None`` (default), uses the current Axes.
+        When an explicit ``ax`` is provided the figure size is not modified and the
+        plot is drawn directly onto the supplied axes.
 
     Returns
     -------
-    ax: matplotlib Axes
+    ax : matplotlib.axes.Axes
         Returns the :external+mpl:class:`~matplotlib.axes.Axes` object with the plot drawn onto it.
 
     Examples
@@ -84,13 +86,6 @@ def heatmap(
         raise Exception(f"Unsupported feature_order: {str(feature_order)}!")
     xlabel = "Instances"
     instance_order = convert_ordering(instance_order, shap_values)
-    # if issubclass(type(instance_order), OpChain):
-    #     #xlabel += " " + instance_order.summary_string("SHAP values")
-    #     instance_order = instance_order.apply(Explanation(values))
-    # elif not hasattr(instance_order, "__len__"):
-    #     raise Exception("Unsupported instance_order: %s!" % str(instance_order))
-    # else:
-    #     instance_order_ops = None
 
     feature_names = np.array(shap_values.feature_names)[feature_order]
     values = shap_values.values[instance_order][:, feature_order]
@@ -112,13 +107,24 @@ def heatmap(
         values = new_values
         feature_values = new_feature_values
 
-    # define the plot size based on how many features we are plotting
-    row_height = 0.5
-    if ax is None:
-        plt.gcf().set_size_inches(plot_width, values.shape[1] * row_height + 2.5)
+    # ------------------------------------------------------------------ #
+    # Axis resolution — mandatory pattern for API consistency              #
+    # ------------------------------------------------------------------ #
+    _ax_provided = ax is not None
+    if not _ax_provided:
         ax = plt.gca()
+    plt.sca(ax)
 
-    # plot the matrix of SHAP values as a heat map
+    # Resize the figure only when we own the axes (i.e. no axes was supplied
+    # by the caller).  When the caller provides an axes object we must not
+    # touch the figure dimensions so that subplot layouts are not broken.
+    row_height = 0.5
+    if not _ax_provided:
+        ax.get_figure().set_size_inches(plot_width, values.shape[1] * row_height + 2.5)
+
+    # ------------------------------------------------------------------ #
+    # Draw the heatmap                                                     #
+    # ------------------------------------------------------------------ #
     vmin, vmax = np.nanpercentile(values.flatten(), [1, 99])
     ax.imshow(
         values.T,
@@ -172,7 +178,10 @@ def heatmap(
     for b in bar_container:
         b.set_clip_on(False)
 
-    # draw the color bar
+    # ------------------------------------------------------------------ #
+    # Colorbar — always attach to the explicit axes so it never lands on  #
+    # a sibling axes when called from a subplot layout.                   #
+    # ------------------------------------------------------------------ #
     import matplotlib.cm as cm
 
     m = cm.ScalarMappable(cmap=cmap)
@@ -183,17 +192,16 @@ def heatmap(
         ax=ax,
         aspect=80,
         fraction=0.01,
-        pad=0.10,  # padding between the cb and the main axes
+        pad=0.10,
     )
     cb.set_label(labels["VALUE"], size=12, labelpad=-10)
     cb.ax.tick_params(labelsize=11, length=0)
     cb.set_alpha(1)
     cb.outline.set_visible(False)  # type: ignore
-    # bbox = cb.ax.get_window_extent().transformed(plt.gcf().dpi_scale_trans.inverted())
-    # cb.ax.set_aspect((bbox.height - 0.9) * 15)
-    # cb.draw_all()
 
+    # ------------------------------------------------------------------ #
+    # Return contract                                                      #
+    # ------------------------------------------------------------------ #
     if show:
         plt.show()
-
     return ax
