@@ -35,6 +35,7 @@ def simple_shap_values():
     return base, shap_vals, feature_names
 
 
+
 @pytest.mark.parametrize(
     "cmap, exp_ctx",
     [
@@ -74,6 +75,8 @@ def test_verify_valid_cmap(cmap, exp_ctx):
 
     with exp_ctx:
         verify_valid_cmap(cmap)
+
+
 
 
 def test_random_force_plot_mpl_with_data(data_explainer_shap_values):
@@ -149,6 +152,8 @@ def test_flipud_reverses_clust_order():
         instance = Instance(np.ones((1, len(feature_names))), np.zeros(len(feature_names)))
         return AdditiveExplanation(base_value, out_value, effects, None, instance, link, model, data)
 
+    # Sample 0: low total  (sum = 1.0)
+    # Sample 1: high total (sum = 10.0)
     exp_low = _make_exp([0.5, 0.5])
     exp_high = _make_exp([5.0, 5.0])
 
@@ -163,13 +168,14 @@ def test_flipud_reverses_clust_order():
     )
 
 
+
 class TestShowFalseReturnsUsableObject:
     """show=False must return a usable matplotlib Axes (matplotlib=True)."""
 
     def test_returns_axes_instance(self, simple_shap_values):
         base, shap_vals, names = simple_shap_values
-        shap.plots.force(base, shap_vals, names, matplotlib=True, show=False)
-        assert isinstance(result, plt.Axes), f"Expected Axes, got {type(result)}"
+        ax = shap.plots.force(base, shap_vals, names, matplotlib=True, show=False)
+        assert isinstance(ax, plt.Axes), f"Expected Axes, got {type(ax)}"
         plt.close("all")
 
     def test_returned_axes_has_correct_figure(self, simple_shap_values):
@@ -263,7 +269,7 @@ class TestChainedUsage:
     def test_force_then_annotate(self, simple_shap_values):
         base, shap_vals, names = simple_shap_values
         ax = shap.plots.force(base, shap_vals, names, matplotlib=True, show=False)
-
+        # Must be able to annotate without error
         ax.set_title("annotated")
         assert ax.get_title() == "annotated"
         plt.close("all")
@@ -274,26 +280,27 @@ class TestBackwardCompatibility:
 
     def test_force_plot_alias(self, simple_shap_values):
         base, shap_vals, names = simple_shap_values
+        # shap.force_plot is the legacy alias
         result = shap.force_plot(base, shap_vals, names, matplotlib=True, show=False)
         assert result is not None
         plt.close("all")
 
     def test_contribution_threshold_param(self, simple_shap_values):
         base, shap_vals, names = simple_shap_values
-        result = shap.plots.force(base, shap_vals, names, matplotlib=True, show=False, contribution_threshold=0.1)
-        assert isinstance(result, plt.Axes)
+        ax = shap.plots.force(base, shap_vals, names, matplotlib=True, show=False, contribution_threshold=0.1)
+        assert isinstance(ax, plt.Axes)
         plt.close("all")
 
     def test_text_rotation_param(self, simple_shap_values):
         base, shap_vals, names = simple_shap_values
-        result = shap.plots.force(base, shap_vals, names, matplotlib=True, show=False, text_rotation=45)
-        assert isinstance(result, plt.Axes)
+        ax = shap.plots.force(base, shap_vals, names, matplotlib=True, show=False, text_rotation=45)
+        assert isinstance(ax, plt.Axes)
         plt.close("all")
 
     def test_plot_cmap_str(self, simple_shap_values):
         base, shap_vals, names = simple_shap_values
-        result = shap.plots.force(base, shap_vals, names, matplotlib=True, show=False, plot_cmap="coolwarm")
-        assert isinstance(result, plt.Axes)
+        ax = shap.plots.force(base, shap_vals, names, matplotlib=True, show=False, plot_cmap="coolwarm")
+        assert isinstance(ax, plt.Axes)
         plt.close("all")
 
 
@@ -305,6 +312,7 @@ class TestEmbeddingDoesNotAlterSiblingPlots:
 
         base, shap_vals, names = simple_shap_values
 
+        # Create a sentinel matplotlib figure before obtaining the HTML
         sentinel_fig, sentinel_ax = plt.subplots()
         sentinel_ax.plot([1, 2], [3, 4])
         n_lines_before = len(sentinel_ax.lines)
@@ -315,6 +323,7 @@ class TestEmbeddingDoesNotAlterSiblingPlots:
         assert isinstance(html, str)
         assert len(html) > 0
 
+        # Sentinel must be untouched
         assert len(sentinel_ax.lines) == n_lines_before
         plt.close("all")
 
