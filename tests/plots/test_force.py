@@ -35,10 +35,6 @@ def simple_shap_values():
     return base, shap_vals, feature_names
 
 
-# ---------------------------------------------------------------------------
-# cmap validation
-# ---------------------------------------------------------------------------
-
 
 @pytest.mark.parametrize(
     "cmap, exp_ctx",
@@ -81,9 +77,6 @@ def test_verify_valid_cmap(cmap, exp_ctx):
         verify_valid_cmap(cmap)
 
 
-# ---------------------------------------------------------------------------
-# Backward-compatibility: existing matplotlib tests
-# ---------------------------------------------------------------------------
 
 
 def test_random_force_plot_mpl_with_data(data_explainer_shap_values):
@@ -159,8 +152,6 @@ def test_flipud_reverses_clust_order():
         instance = Instance(np.ones((1, len(feature_names))), np.zeros(len(feature_names)))
         return AdditiveExplanation(base_value, out_value, effects, None, instance, link, model, data)
 
-    # Sample 0: low total  (sum = 1.0)
-    # Sample 1: high total (sum = 10.0)
     exp_low = _make_exp([0.5, 0.5])
     exp_high = _make_exp([5.0, 5.0])
 
@@ -175,9 +166,6 @@ def test_flipud_reverses_clust_order():
     )
 
 
-# ---------------------------------------------------------------------------
-# API consistency tests (new)
-# ---------------------------------------------------------------------------
 
 
 class TestShowFalseReturnsUsableObject:
@@ -185,7 +173,7 @@ class TestShowFalseReturnsUsableObject:
 
     def test_returns_axes_instance(self, simple_shap_values):
         base, shap_vals, names = simple_shap_values
-        result = shap.plots.force(base, shap_vals, names, matplotlib=True, show=False)
+        shap.plots.force(base, shap_vals, names, matplotlib=True, show=False)
         assert isinstance(result, plt.Axes), f"Expected Axes, got {type(result)}"
         plt.close("all")
 
@@ -250,7 +238,7 @@ class TestAxParameter:
     def test_no_ax_creates_new_figure(self, simple_shap_values):
         base, shap_vals, names = simple_shap_values
         figs_before = set(map(id, map(plt.figure, plt.get_fignums())))
-        result = shap.plots.force(base, shap_vals, names, matplotlib=True, show=False)
+        shap.plots.force(base, shap_vals, names, matplotlib=True, show=False)
         new_fig_ids = set(map(id, map(plt.figure, plt.get_fignums()))) - figs_before
         assert len(new_fig_ids) >= 1, "A new figure should have been created when ax=None"
         plt.close("all")
@@ -280,7 +268,7 @@ class TestChainedUsage:
     def test_force_then_annotate(self, simple_shap_values):
         base, shap_vals, names = simple_shap_values
         ax = shap.plots.force(base, shap_vals, names, matplotlib=True, show=False)
-        # Must be able to annotate without error
+
         ax.set_title("annotated")
         assert ax.get_title() == "annotated"
         plt.close("all")
@@ -291,7 +279,6 @@ class TestBackwardCompatibility:
 
     def test_force_plot_alias(self, simple_shap_values):
         base, shap_vals, names = simple_shap_values
-        # shap.force_plot is the legacy alias
         result = shap.force_plot(base, shap_vals, names, matplotlib=True, show=False)
         assert result is not None
         plt.close("all")
@@ -323,7 +310,7 @@ class TestEmbeddingDoesNotAlterSiblingPlots:
 
         base, shap_vals, names = simple_shap_values
 
-        # Create a sentinel matplotlib figure before obtaining the HTML
+
         sentinel_fig, sentinel_ax = plt.subplots()
         sentinel_ax.plot([1, 2], [3, 4])
         n_lines_before = len(sentinel_ax.lines)
@@ -334,7 +321,6 @@ class TestEmbeddingDoesNotAlterSiblingPlots:
         assert isinstance(html, str)
         assert len(html) > 0
 
-        # Sentinel must be untouched
         assert len(sentinel_ax.lines) == n_lines_before
         plt.close("all")
 
