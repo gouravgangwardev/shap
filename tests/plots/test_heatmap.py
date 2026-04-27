@@ -15,9 +15,7 @@ import shap
 
 matplotlib.use("Agg")
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
+
 
 
 def _make_explanation(n_samples=40, n_features=6, seed=0):
@@ -33,9 +31,7 @@ def _make_explanation(n_samples=40, n_features=6, seed=0):
     )
 
 
-# ---------------------------------------------------------------------------
-# Image-comparison regression tests (existing, kept for backward compat)
-# ---------------------------------------------------------------------------
+
 
 
 @pytest.mark.mpl_image_compare
@@ -63,9 +59,6 @@ def test_heatmap_feature_order(explainer):
     return fig
 
 
-# ---------------------------------------------------------------------------
-# API-consistency tests
-# ---------------------------------------------------------------------------
 
 
 class TestHeatmapReturnValue:
@@ -76,7 +69,7 @@ class TestHeatmapReturnValue:
         fig, ax = plt.subplots()
         result = shap.plots.heatmap(sv, ax=ax, show=False)
         assert isinstance(result, matplotlib.axes.Axes), (
-            "heatmap(show=False) must return an Axes object, got %r" % type(result)
+            f"heatmap(show=False) must return an Axes object, got {type(result)!r}"
         )
         plt.close(fig)
 
@@ -84,7 +77,9 @@ class TestHeatmapReturnValue:
         sv = _make_explanation()
         fig = plt.figure()
         result = shap.plots.heatmap(sv, show=False)
-        assert isinstance(result, matplotlib.axes.Axes), "heatmap(show=False) without ax= must return an Axes object"
+        assert isinstance(result, matplotlib.axes.Axes), (
+            "heatmap(show=False) without ax= must return an Axes object"
+        )
         plt.close(fig)
 
 
@@ -95,7 +90,9 @@ class TestHeatmapAxIdentity:
         sv = _make_explanation()
         fig, ax = plt.subplots()
         result = shap.plots.heatmap(sv, ax=ax, show=False)
-        assert result is ax, "heatmap must return the exact Axes object that was supplied via ax="
+        assert result is ax, (
+            "heatmap must return the exact Axes object that was supplied via ax="
+        )
         plt.close(fig)
 
 
@@ -142,7 +139,7 @@ class TestHeatmapResizeGuard:
         sv = _make_explanation()
         fig = plt.figure(figsize=(4, 4))
         shap.plots.heatmap(sv, show=False)
-        # Just check it doesn't raise; the actual size is implementation-defined.
+    
         plt.close(fig)
 
 
@@ -173,13 +170,10 @@ class TestHeatmapColorbar:
     def test_colorbar_attaches_to_provided_ax(self):
         sv = _make_explanation()
         fig, (ax1, ax2) = plt.subplots(1, 2)
-        n_axes_before = len(fig.axes)
 
         shap.plots.heatmap(sv, ax=ax1, show=False)
 
-        # After the call, the figure should have grown by exactly one colorbar
-        # axes (matplotlib appends a new axes for the colorbar).  Crucially, the
-        # colorbar axes must be associated with ax1, NOT ax2.
+ 
         new_axes = [a for a in fig.axes if a not in (ax1, ax2)]
         assert len(new_axes) >= 1, "expected at least one colorbar axes to be created"
 
@@ -192,7 +186,9 @@ class TestHeatmapColorbar:
         fig = plt.figure()
         shap.plots.heatmap(sv, show=False)
         # At least two axes should exist: the main heatmap axes + colorbar axes
-        assert len(fig.axes) >= 2, "expected heatmap axes and colorbar axes when no ax= provided"
+        assert len(fig.axes) >= 2, (
+            "expected heatmap axes and colorbar axes when no ax= provided"
+        )
         plt.close(fig)
 
 
