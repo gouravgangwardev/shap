@@ -10,8 +10,8 @@ from ._utils import convert_ordering
 
 def heatmap(
     shap_values: Explanation,
-    instance_order=Explanation.hclust(),  
-    feature_values=Explanation.abs.mean(0),  
+    instance_order=Explanation.hclust(),
+    feature_values=Explanation.abs.mean(0),
     feature_order=None,
     max_display=10,
     cmap=colors.red_white_blue,
@@ -91,7 +91,6 @@ def heatmap(
     values = shap_values.values[instance_order][:, feature_order]
     feature_values = feature_values[feature_order]
 
-
     if values.shape[1] > max_display:
         new_values = np.zeros((values.shape[0], max_display))
         new_values[:, :-1] = values[:, : max_display - 1]
@@ -106,17 +105,14 @@ def heatmap(
         values = new_values
         feature_values = new_feature_values
 
-
     _ax_provided = ax is not None
     if not _ax_provided:
         ax = plt.gca()
     plt.sca(ax)
 
-
     row_height = 0.5
     if not _ax_provided:
         ax.get_figure().set_size_inches(plot_width, values.shape[1] * row_height + 2.5)
-
 
     vmin, vmax = np.nanpercentile(values.flatten(), [1, 99])
     ax.imshow(
@@ -186,7 +182,7 @@ def heatmap(
     cb.set_label(labels["VALUE"], size=12, labelpad=-10)
     cb.ax.tick_params(labelsize=11, length=0)
     cb.set_alpha(1)
-    cb.outline.set_visible(False)  
+    cb.outline.set_visible(False)
 
     if show:
         plt.show()
