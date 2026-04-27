@@ -35,7 +35,6 @@ def simple_shap_values():
     return base, shap_vals, feature_names
 
 
-
 @pytest.mark.parametrize(
     "cmap, exp_ctx",
     [
@@ -75,8 +74,6 @@ def test_verify_valid_cmap(cmap, exp_ctx):
 
     with exp_ctx:
         verify_valid_cmap(cmap)
-
-
 
 
 def test_random_force_plot_mpl_with_data(data_explainer_shap_values):
@@ -164,8 +161,6 @@ def test_flipud_reverses_clust_order():
         f"Higher-prediction sample should come first (lower simIndex), "
         f"got simIndex_high={sim_high}, simIndex_low={sim_low}"
     )
-
-
 
 
 class TestShowFalseReturnsUsableObject:
@@ -309,7 +304,6 @@ class TestEmbeddingDoesNotAlterSiblingPlots:
         from shap.plots._force import BaseVisualizer
 
         base, shap_vals, names = simple_shap_values
-
 
         sentinel_fig, sentinel_ax = plt.subplots()
         sentinel_ax.plot([1, 2], [3, 4])
