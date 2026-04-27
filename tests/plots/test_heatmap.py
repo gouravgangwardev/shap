@@ -84,9 +84,7 @@ class TestHeatmapReturnValue:
         sv = _make_explanation()
         fig = plt.figure()
         result = shap.plots.heatmap(sv, show=False)
-        assert isinstance(result, matplotlib.axes.Axes), (
-            "heatmap(show=False) without ax= must return an Axes object"
-        )
+        assert isinstance(result, matplotlib.axes.Axes), "heatmap(show=False) without ax= must return an Axes object"
         plt.close(fig)
 
 
@@ -97,9 +95,7 @@ class TestHeatmapAxIdentity:
         sv = _make_explanation()
         fig, ax = plt.subplots()
         result = shap.plots.heatmap(sv, ax=ax, show=False)
-        assert result is ax, (
-            "heatmap must return the exact Axes object that was supplied via ax="
-        )
+        assert result is ax, "heatmap must return the exact Axes object that was supplied via ax="
         plt.close(fig)
 
 
@@ -196,9 +192,7 @@ class TestHeatmapColorbar:
         fig = plt.figure()
         shap.plots.heatmap(sv, show=False)
         # At least two axes should exist: the main heatmap axes + colorbar axes
-        assert len(fig.axes) >= 2, (
-            "expected heatmap axes and colorbar axes when no ax= provided"
-        )
+        assert len(fig.axes) >= 2, "expected heatmap axes and colorbar axes when no ax= provided"
         plt.close(fig)
 
 
