@@ -35,7 +35,6 @@ def simple_shap_values():
     return base, shap_vals, feature_names
 
 
-
 @pytest.mark.parametrize(
     "cmap, exp_ctx",
     [
@@ -75,9 +74,6 @@ def test_verify_valid_cmap(cmap, exp_ctx):
 
     with exp_ctx:
         verify_valid_cmap(cmap)
-
-
-
 
 
 def test_random_force_plot_mpl_with_data(data_explainer_shap_values):
@@ -169,9 +165,6 @@ def test_flipud_reverses_clust_order():
     )
 
 
-
-
-
 class TestShowFalseReturnsUsableObject:
     """show=False must return a usable matplotlib Axes (matplotlib=True)."""
 
@@ -200,14 +193,14 @@ class TestNoGlobalStateContamination:
     """force(show=False) must not silently alter shared pyplot state."""
 
     def test_current_figure_unchanged(self, simple_shap_values):
-         base, shap_vals, names = simple_shap_values
-         fig_before, ax_before = plt.subplots()
-         ax_before.plot([1, 2], [3, 4])
-         lines_before = len(ax_before.lines)
-         _ = shap.plots.force(base, shap_vals, names, matplotlib=True, show=False)
-         assert ax_before.get_figure() is fig_before, "Existing axes must still reference their original figure"
-         assert len(ax_before.lines) == lines_before, "Existing axes data must not be modified by force plot call"
-         plt.close("all")
+        base, shap_vals, names = simple_shap_values
+        fig_before, ax_before = plt.subplots()
+        ax_before.plot([1, 2], [3, 4])
+        lines_before = len(ax_before.lines)
+        _ = shap.plots.force(base, shap_vals, names, matplotlib=True, show=False)
+        assert ax_before.get_figure() is fig_before, "Existing axes must still reference their original figure"
+        assert len(ax_before.lines) == lines_before, "Existing axes data must not be modified by force plot call"
+        plt.close("all")
 
     def test_sibling_axes_data_intact(self, simple_shap_values):
         """Data plotted on a sibling axes must survive a force plot call."""
@@ -245,8 +238,7 @@ class TestAxParameter:
         figs_before = set(plt.get_fignums())
         shap.plots.force(base, shap_vals, names, matplotlib=True, show=False)
         figs_after = set(plt.get_fignums())
-        assert len(figs_after - figs_before) >= 1, \
-            "A new figure should have been created when ax=None"
+        assert len(figs_after - figs_before) >= 1, "A new figure should have been created when ax=None"
         plt.close("all")
 
     def test_figsize_ignored_when_ax_provided(self, simple_shap_values):
@@ -255,8 +247,7 @@ class TestAxParameter:
         fig, ax = plt.subplots(figsize=(5, 5))
         original_size = fig.get_size_inches().tolist()
         shap.plots.force(base, shap_vals, names, matplotlib=True, show=False, ax=ax)
-        assert fig.get_size_inches().tolist() == original_size, \
-            "Figure size must remain unchanged when ax is provided"
+        assert fig.get_size_inches().tolist() == original_size, "Figure size must remain unchanged when ax is provided"
         plt.close("all")
 
 
