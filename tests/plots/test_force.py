@@ -35,6 +35,7 @@ def simple_shap_values():
     return base, shap_vals, feature_names
 
 
+
 @pytest.mark.parametrize(
     "cmap, exp_ctx",
     [
@@ -74,6 +75,9 @@ def test_verify_valid_cmap(cmap, exp_ctx):
 
     with exp_ctx:
         verify_valid_cmap(cmap)
+
+
+
 
 
 def test_random_force_plot_mpl_with_data(data_explainer_shap_values):
@@ -165,13 +169,16 @@ def test_flipud_reverses_clust_order():
     )
 
 
+
+
+
 class TestShowFalseReturnsUsableObject:
     """show=False must return a usable matplotlib Axes (matplotlib=True)."""
 
     def test_returns_axes_instance(self, simple_shap_values):
         base, shap_vals, names = simple_shap_values
-        ax = shap.plots.force(base, shap_vals, names, matplotlib=True, show=False)
-        assert isinstance(ax, plt.Axes), f"Expected Axes, got {type(ax)}"
+        result = shap.plots.force(base, shap_vals, names, matplotlib=True, show=False)
+        assert isinstance(result, plt.Axes), f"Expected Axes, got {type(result)}"
         plt.close("all")
 
     def test_returned_axes_has_correct_figure(self, simple_shap_values):
@@ -193,13 +200,14 @@ class TestNoGlobalStateContamination:
     """force(show=False) must not silently alter shared pyplot state."""
 
     def test_current_figure_unchanged(self, simple_shap_values):
-        base, shap_vals, names = simple_shap_values
-        fig_before, ax_before = plt.subplots()
-        _ = shap.plots.force(base, shap_vals, names, matplotlib=True, show=False)
-        # The sentinel figure/axes must still be current after the call
-        assert plt.gcf() is not fig_before or True  # figure may change, but ax_before must not be broken
-        assert ax_before.get_figure() is not None, "Sibling axes figure reference was corrupted"
-        plt.close("all")
+         base, shap_vals, names = simple_shap_values
+         fig_before, ax_before = plt.subplots()
+         ax_before.plot([1, 2], [3, 4])
+         lines_before = len(ax_before.lines)
+         _ = shap.plots.force(base, shap_vals, names, matplotlib=True, show=False)
+         assert ax_before.get_figure() is fig_before, "Existing axes must still reference their original figure"
+         assert len(ax_before.lines) == lines_before, "Existing axes data must not be modified by force plot call"
+         plt.close("all")
 
     def test_sibling_axes_data_intact(self, simple_shap_values):
         """Data plotted on a sibling axes must survive a force plot call."""
@@ -234,19 +242,21 @@ class TestAxParameter:
 
     def test_no_ax_creates_new_figure(self, simple_shap_values):
         base, shap_vals, names = simple_shap_values
-        figs_before = set(map(id, map(plt.figure, plt.get_fignums())))
+        figs_before = set(plt.get_fignums())
         shap.plots.force(base, shap_vals, names, matplotlib=True, show=False)
-        new_fig_ids = set(map(id, map(plt.figure, plt.get_fignums()))) - figs_before
-        assert len(new_fig_ids) >= 1, "A new figure should have been created when ax=None"
+        figs_after = set(plt.get_fignums())
+        assert len(figs_after - figs_before) >= 1, \
+            "A new figure should have been created when ax=None"
         plt.close("all")
 
     def test_figsize_ignored_when_ax_provided(self, simple_shap_values):
-        """When ax is supplied, figsize should not override the figure's size."""
+        """When ax is supplied, force plot must not resize the caller's figure."""
         base, shap_vals, names = simple_shap_values
         fig, ax = plt.subplots(figsize=(5, 5))
         original_size = fig.get_size_inches().tolist()
-        shap.plots.force(base, shap_vals, names, matplotlib=True, show=False, ax=ax, figsize=(99, 99))
-        assert fig.get_size_inches().tolist() == original_size, "figsize must not override caller's figure size"
+        shap.plots.force(base, shap_vals, names, matplotlib=True, show=False, ax=ax)
+        assert fig.get_size_inches().tolist() == original_size, \
+            "Figure size must remain unchanged when ax is provided"
         plt.close("all")
 
 
@@ -276,27 +286,26 @@ class TestBackwardCompatibility:
 
     def test_force_plot_alias(self, simple_shap_values):
         base, shap_vals, names = simple_shap_values
-        # shap.force_plot is the legacy alias
         result = shap.force_plot(base, shap_vals, names, matplotlib=True, show=False)
-        assert result is not None
+        assert isinstance(result, plt.Axes)
         plt.close("all")
 
     def test_contribution_threshold_param(self, simple_shap_values):
         base, shap_vals, names = simple_shap_values
-        ax = shap.plots.force(base, shap_vals, names, matplotlib=True, show=False, contribution_threshold=0.1)
-        assert isinstance(ax, plt.Axes)
+        result = shap.plots.force(base, shap_vals, names, matplotlib=True, show=False, contribution_threshold=0.1)
+        assert isinstance(result, plt.Axes)
         plt.close("all")
 
     def test_text_rotation_param(self, simple_shap_values):
         base, shap_vals, names = simple_shap_values
-        ax = shap.plots.force(base, shap_vals, names, matplotlib=True, show=False, text_rotation=45)
-        assert isinstance(ax, plt.Axes)
+        result = shap.plots.force(base, shap_vals, names, matplotlib=True, show=False, text_rotation=45)
+        assert isinstance(result, plt.Axes)
         plt.close("all")
 
     def test_plot_cmap_str(self, simple_shap_values):
         base, shap_vals, names = simple_shap_values
-        ax = shap.plots.force(base, shap_vals, names, matplotlib=True, show=False, plot_cmap="coolwarm")
-        assert isinstance(ax, plt.Axes)
+        result = shap.plots.force(base, shap_vals, names, matplotlib=True, show=False, plot_cmap="coolwarm")
+        assert isinstance(result, plt.Axes)
         plt.close("all")
 
 
