@@ -9,7 +9,6 @@ import shap
 matplotlib.use("Agg")
 
 
-
 @pytest.fixture
 def simple_data():
     """Minimal synthetic SHAP values for fast unit tests."""
@@ -30,8 +29,6 @@ def values_features():
     return shap_values, X
 
 
-
-
 def test_random_decision(random_seed):
     """Make sure the decision plot does not crash on random data (legacy call)."""
     rs = np.random.RandomState(random_seed)
@@ -47,15 +44,12 @@ def test_backward_compat_no_ax(simple_data):
     plt.close("all")
 
 
-
 def test_show_false_returns_axes(simple_data):
     """show=False returns a matplotlib Axes object."""
     base, sv, _ = simple_data
     fig, ax = plt.subplots()
     result = shap.plots.decision(base, sv, ax=ax, show=False)
-    assert isinstance(result, matplotlib.axes.Axes), (
-        f"Expected Axes, got {type(result)}"
-    )
+    assert isinstance(result, matplotlib.axes.Axes), f"Expected Axes, got {type(result)}"
     plt.close("all")
 
 
@@ -85,8 +79,6 @@ def test_return_objects_precedence(simple_data):
     plt.close("all")
 
 
-
-
 def test_ax_identity_preserved(simple_data):
     """The returned Axes is the same object that was passed in."""
     base, sv, _ = simple_data
@@ -94,8 +86,6 @@ def test_ax_identity_preserved(simple_data):
     result = shap.plots.decision(base, sv, ax=ax, show=False)
     assert result is ax, "Returned Axes must be the same object passed via ax="
     plt.close("all")
-
-
 
 
 def test_subplot_isolation(simple_data):
@@ -116,8 +106,6 @@ def test_subplot_isolation(simple_data):
     plt.close("all")
 
 
-
-
 def test_figure_size_unchanged_when_ax_provided(simple_data):
     """auto_size_plot must not resize the figure when ax is explicitly provided."""
     base, sv, _ = simple_data
@@ -128,8 +116,7 @@ def test_figure_size_unchanged_when_ax_provided(simple_data):
 
     w_after, h_after = fig.get_size_inches()
     assert (w_after, h_after) == (w_before, h_before), (
-        f"Figure was resized from {(w_before, h_before)} to {(w_after, h_after)} "
-        "even though ax was provided"
+        f"Figure was resized from {(w_before, h_before)} to {(w_after, h_after)} even though ax was provided"
     )
     plt.close("all")
 
@@ -148,8 +135,6 @@ def test_figure_resized_when_no_ax(simple_data):
     plt.close("all")
 
 
-
-
 def test_multiple_calls_same_ax(simple_data):
     """Calling decision_plot twice on the same ax must not raise."""
     base, sv, _ = simple_data
@@ -159,8 +144,6 @@ def test_multiple_calls_same_ax(simple_data):
     assert r1 is ax
     assert r2 is ax
     plt.close("all")
-
-
 
 
 def test_legend_attaches_to_correct_ax(simple_data):
@@ -174,8 +157,6 @@ def test_legend_attaches_to_correct_ax(simple_data):
     assert ax1.get_legend() is not None, "Legend missing on target ax1"
     assert ax2.get_legend() is None, "Legend incorrectly placed on sibling ax2"
     plt.close("all")
-
-
 
 
 def test_no_pyplot_state_leakage(simple_data):
@@ -192,12 +173,8 @@ def test_no_pyplot_state_leakage(simple_data):
     assert ax2 in fig.axes, "ax2 is missing from the figure after decision plot"
     # The colorbar inset is allowed (created inside ax1's data space), so we permit
     # len == 2 (no colorbar) or len == 3 (with inset colorbar axes).
-    assert len(fig.axes) in (2, 3), (
-        f"Unexpected number of axes: {len(fig.axes)}"
-    )
+    assert len(fig.axes) in (2, 3), f"Unexpected number of axes: {len(fig.axes)}"
     plt.close("all")
-
-
 
 
 @pytest.mark.mpl_image_compare
@@ -262,8 +239,6 @@ def test_decision_multioutput(values_features):
     shap.multioutput_decision_plot(base_values_list, adult_rfc_shap_values_list, row_index=0, features=X, show=False)
     plt.tight_layout()
     return fig
-
-
 
 
 def test_multioutput_decision_raises(values_features):
