@@ -240,11 +240,11 @@ def bar(
     if num_features < len(values[0]):
         yticklabels[-1] = f"Sum of {num_cut} other features"
 
-    if ax is None:
-        ax = plt.gca()
-        # Only modify the figure size if ax was not passed in
+    
+    _ax_provided = ax is not None
+    if not _ax_provided:
+        fig, ax = plt.subplots()
         # compute our figure size based on how many features we are showing
-        fig = plt.gcf()
         row_height = 0.5
         fig.set_size_inches(8, num_features * row_height * np.sqrt(len(values)) + 1.5)
 
@@ -339,9 +339,6 @@ def bar(
     else:
         ax.set_xlim(xmin, xmax + x_buffer)
 
-    # if features is None:
-    #     plt.xlabel(labels["GLOBAL_VALUE"], fontsize=13)
-    # else:
     ax.set_xlabel(xlabel, fontsize=13)
 
     if len(values) > 1:
@@ -390,6 +387,7 @@ def bar(
 
     if show:
         plt.show()
+        return None
     else:
         return ax
 
