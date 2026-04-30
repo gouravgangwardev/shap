@@ -238,9 +238,7 @@ def test_colorbar_with_explicit_ax():
         ax1_x0 = ax1.get_position().x0
         cb_x0 = cb_ax.get_position().x0
 
-        assert cb_x0 >= ax1_x0, (
-            f"Colorbar axes at x0={cb_x0:.3f} appears to be left of ax1 (x0={ax1_x0:.3f})"
-        )
+        assert cb_x0 >= ax1_x0, f"Colorbar axes at x0={cb_x0:.3f} appears to be left of ax1 (x0={ax1_x0:.3f})"
 
     plt.close("all")
 
