@@ -221,21 +221,27 @@ def test_colorbar_with_explicit_ax():
     """Colorbar must attach to the provided ax without error or leaking to other axes."""
     plt.close("all")
     fig, (ax1, ax2) = plt.subplots(1, 2)
-    n_fig_axes_before = len(fig.axes)  # baseline: 2 axes
+
     expln = _make_explanation()
     result = shap.plots.beeswarm(expln, color_bar=True, ax=ax1, show=False)
+
     assert result is ax1, "beeswarm() must return the axes it was given"
-    # Colorbar insets the parent figure axes list; none of those should be ax2's data content
+
+    # Ensure sibling axes untouched
     assert ax2.get_xlabel() == "", "colorbar should not have written an xlabel onto sibling ax2"
     assert len(ax2.collections) == 0, "sibling ax2 should have no scatter artists after colorbar"
-    # The new colorbar axes (if any) must be associated with ax1's figure, not ax2
+
+    # Validate any new axes belong to ax1 region (colorbar inset behavior)
     new_axes = [a for a in fig.axes if a is not ax1 and a is not ax2]
+
     for cb_ax in new_axes:
-        # colorbar axes should be inset within ax1's bounds, not ax2's
         ax1_x0 = ax1.get_position().x0
-        ax2_x1 = ax2.get_position().x1
         cb_x0 = cb_ax.get_position().x0
-        assert cb_x0 >= ax1_x0, f"Colorbar axes at x0={cb_x0:.3f} appears to be left of ax1 (x0={ax1_x0:.3f})"
+
+        assert cb_x0 >= ax1_x0, (
+            f"Colorbar axes at x0={cb_x0:.3f} appears to be left of ax1 (x0={ax1_x0:.3f})"
+        )
+
     plt.close("all")
 
 
