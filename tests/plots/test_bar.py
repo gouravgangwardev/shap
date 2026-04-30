@@ -112,9 +112,6 @@ def test_bar_raises_error_for_empty_explanation(explainer):
         shap.plots.bar(shap_values[0:0], show=False)
 
 
-
-
-
 def _make_explanation(n=50, n_features=5, seed=0):
     """Create a simple multi-row Explanation for unit tests."""
     rs = np.random.RandomState(seed)

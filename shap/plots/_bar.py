@@ -240,7 +240,6 @@ def bar(
     if num_features < len(values[0]):
         yticklabels[-1] = f"Sum of {num_cut} other features"
 
-    
     _ax_provided = ax is not None
     if not _ax_provided:
         fig, ax = plt.subplots()

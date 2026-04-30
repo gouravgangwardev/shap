@@ -170,9 +170,7 @@ def test_subplot_isolation():
     assert ax2.get_title() == ax2_title_before, "sibling ax2 title was modified"
     assert ax2.get_xlabel() == ax2_xlabel_before, "sibling ax2 xlabel was modified"
     assert len(ax2.lines) == ax2_n_lines_before, "sibling ax2 gained unexpected line artists"
-    assert len(ax2.collections) == ax2_n_collections_before, (
-        "sibling ax2 gained unexpected scatter/collection artists"
-    )
+    assert len(ax2.collections) == ax2_n_collections_before, "sibling ax2 gained unexpected scatter/collection artists"
     plt.close("all")
 
 
@@ -200,9 +198,7 @@ def test_multiple_calls_on_same_ax():
 
     shap.plots.beeswarm(expln, ax=ax, show=False)
     n_collections_after_first = len(ax.collections)
-    assert n_collections_after_first > 0, (
-        "First beeswarm() call produced no scatter collections on the axes"
-    )
+    assert n_collections_after_first > 0, "First beeswarm() call produced no scatter collections on the axes"
 
     shap.plots.beeswarm(expln, ax=ax, show=False)
     n_collections_after_second = len(ax.collections)
@@ -239,9 +235,7 @@ def test_colorbar_with_explicit_ax():
         ax1_x0 = ax1.get_position().x0
         ax2_x1 = ax2.get_position().x1
         cb_x0 = cb_ax.get_position().x0
-        assert cb_x0 >= ax1_x0, (
-            f"Colorbar axes at x0={cb_x0:.3f} appears to be left of ax1 (x0={ax1_x0:.3f})"
-        )
+        assert cb_x0 >= ax1_x0, f"Colorbar axes at x0={cb_x0:.3f} appears to be left of ax1 (x0={ax1_x0:.3f})"
     plt.close("all")
 
 
@@ -276,9 +270,7 @@ def test_pyplot_current_axes_not_clobbered():
     expln = _make_explanation()
     shap.plots.beeswarm(expln, ax=ax1, show=False)
 
-    assert plt.gca() is ax2, (
-        "beeswarm() must not change plt.gca() when an explicit ax is supplied"
-    )
+    assert plt.gca() is ax2, "beeswarm() must not change plt.gca() when an explicit ax is supplied"
     plt.close("all")
 
 

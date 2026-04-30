@@ -303,7 +303,5 @@ def test_no_pyplot_state_leak_when_ax_provided():
     shap.plots.scatter(expln, ax=ax1, show=False)
 
     current_after = plt.gca()
-    assert current_after is current_before, (
-        "scatter() must not mutate pyplot current axes when ax= is provided"
-    )
+    assert current_after is current_before, "scatter() must not mutate pyplot current axes when ax= is provided"
     plt.close("all")
